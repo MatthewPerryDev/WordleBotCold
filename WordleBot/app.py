@@ -5,7 +5,8 @@ from nacl.exceptions import BadSignatureError
 
 
 ssm = boto3.client('ssm')
-PUBLIC_KEY = ssm.get_parameter(Name='public-key',WithDecryption=False)['public-key']['Value']
+PUBLIC_KEY = ssm.get_parameter(
+    Name='public-key', WithDecryption=False)['Parameter']['Value']
 
 
 def lambda_handler(event, context):
