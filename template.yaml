@@ -15,6 +15,7 @@ Resources:
   WordleBotFunction:
     Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Properties:
+      FunctionName: WordleBot
       CodeUri: WordleBot/
       Handler: app.lambda_handler
       Runtime: python3.9
@@ -29,6 +30,18 @@ Resources:
             Path: /wordlebot
             Method: post
 
+  WordleBotSyncFunction:
+    Type: AWS::Serverless::Function # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
+    Properties:
+      FunctionName: WordleBotSync
+      CodeUri: WordleBotSync/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Architectures:
+        - x86_64
+      Policies:
+        - AmazonSSMReadOnlyAccess
+    
 Outputs:
   # ServerlessRestApi is an implicit API created out of Events key under Serverless::Function
   # Find out more about other implicit resources you can reference within SAM
