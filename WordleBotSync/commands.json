@@ -1,5 +1,12 @@
-{
-	"name": "bleb",
-	"description": "Testing whether sync function works",
-	"options": []
-}
+[
+  {
+    "name": "bleb",
+    "description": "testing",
+    "options": []
+   },
+   {
+    "name": "bleb2",
+    "description": "testing two",
+    "options": []
+   }
+]

@@ -53,11 +53,20 @@ def lambda_handler(event, context):
     except:
         raise
 
-
 def command_handler(body):
     command = body['data']['name']
     
     if command == 'bleb':
+        return {
+            'statusCode': 200,
+            'body': json.dumps({
+                'type': 4,
+                'data': {
+                    'content': 'Hello, World.',
+                }
+            })
+        }
+    elif command == 'bleb2':
         return {
             'statusCode': 200,
             'body': json.dumps({
@@ -72,3 +81,9 @@ def command_handler(body):
             'statusCode': 400,
             'body': json.dumps('unhandled command')
         }
+#####
+# Functions that correspond to slash commands
+#####
+
+def wordle():
+    pass
