@@ -21,3 +21,4 @@ jobs:
       # Prevent prompts and failure when the stack is unchanged
       - run: sam deploy --no-confirm-changeset --no-fail-on-empty-changeset
       # Run a lambda function to sync the commands with discord
+      - run: aws lambda invoke --function-name "WordleBotSync" output.json
