@@ -10,8 +10,10 @@ def lambda_handler(event, context):
     
     url = f'https://discord.com/api/v10/applications/{APP_ID}/guilds/{GUILD_ID}/commands'
 
-    commands = json.loads(open('commands.json','r').read())
+    with open('commands.json','r') as f:
+        commands = json.loads(f.read())
 
     response = requests.put(url, headers={
         'Authorization': f'Bot {BOT_TOKEN}'
     }, json=commands)
+    print(response.text)

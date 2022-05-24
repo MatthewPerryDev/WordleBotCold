@@ -1,12 +1,14 @@
 [
-  {
-    "name": "bleb",
-    "description": "testing",
-    "options": []
-   },
-   {
-    "name": "bleb2",
-    "description": "testing two",
-    "options": []
-   }
+	{
+		"name": "wordle",
+		"description": "Submit your solution for todays wordle.",
+		"options": [
+			{
+				"type": 3,
+				"name": "solution",
+				"description": "solution",
+				"required": true
+			}
+		]
+	}
 ]

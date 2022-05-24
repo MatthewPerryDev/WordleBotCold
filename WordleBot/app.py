@@ -5,8 +5,7 @@ from nacl.exceptions import BadSignatureError
 
 
 ssm = boto3.client('ssm')
-PUBLIC_KEY = ssm.get_parameter(
-    Name='public-key', WithDecryption=False)['Parameter']['Value']
+PUBLIC_KEY = ssm.get_parameter( Name='public-key', WithDecryption=False)['Parameter']['Value']
 
 
 def lambda_handler(event, context):
@@ -56,23 +55,13 @@ def lambda_handler(event, context):
 def command_handler(body):
     command = body['data']['name']
     
-    if command == 'bleb':
+    if command == 'wordle':
         return {
             'statusCode': 200,
             'body': json.dumps({
                 'type': 4,
                 'data': {
-                    'content': 'Hello, World.',
-                }
-            })
-        }
-    elif command == 'bleb2':
-        return {
-            'statusCode': 200,
-            'body': json.dumps({
-                'type': 4,
-                'data': {
-                    'content': 'Hello, World.',
+                    'content': 'Wordle',
                 }
             })
         }
@@ -85,5 +74,5 @@ def command_handler(body):
 # Functions that correspond to slash commands
 #####
 
-def wordle():
+def wordle(body):
     pass
