@@ -9,7 +9,6 @@ PUBLIC_KEY = ssm.get_parameter( Name='public-key', WithDecryption=False)['Parame
 
 
 def lambda_handler(event, context):
-    print(event)
     try:
         body = json.loads(event['body'])
 
@@ -17,15 +16,16 @@ def lambda_handler(event, context):
         timestamp = event['headers']['x-signature-timestamp']
 
         # validate the interaction
-
         verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 
         message = timestamp + json.dumps(body, separators=(',', ':'))
 
         try:
+            print('verify')
             verify_key.verify(message.encode(),
                               signature=bytes.fromhex(signature))
         except BadSignatureError:
+            print('failed')
             return {
                 'statusCode': 401,
                 'body': json.dumps('invalid request signature')
@@ -56,14 +56,15 @@ def command_handler(body):
     command = body['data']['name']
     
     if command == 'wordle':
+        response = json.dumps({
+            'type': 4,
+            'data': {
+                'content': f"{body['data']['options'][0]['value']}",
+            }
+        })
         return {
             'statusCode': 200,
-            'body': json.dumps({
-                'type': 4,
-                'data': {
-                    'content': 'Wordle',
-                }
-            })
+            'body': response
         }
     else:
         return {
