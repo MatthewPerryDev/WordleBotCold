@@ -5,33 +5,14 @@ from nacl.exceptions import BadSignatureError
 
 
 ssm = boto3.client('ssm')
-PUBLIC_KEY = ssm.get_parameter( Name='public-key', WithDecryption=False)['Parameter']['Value']
+PUBLIC_KEY = ssm.get_parameter(
+    Name='public-key', WithDecryption=False)['Parameter']['Value']
 
 
 def lambda_handler(event, context):
-    print(event)
     try:
         body = json.loads(event['body'])
-
-        signature = event['headers']['x-signature-ed25519']
-        timestamp = event['headers']['x-signature-timestamp']
-
-        # validate the interaction
-        verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
-
-
-        message = timestamp + json.dumps(body, separators=(',', ':'), ensure_ascii=False)
-
-        try:
-            print('verify')
-            verify_key.verify(message.encode(),signature=bytes.fromhex(signature))
-        except BadSignatureError:
-            print('failed')
-            return {
-                'statusCode': 401,
-                'body': json.dumps('invalid request signature')
-            }
-
+        verify(event,body)
         # handle the interaction
 
         t = body['type']
@@ -53,28 +34,50 @@ def lambda_handler(event, context):
     except:
         raise
 
+
 def command_handler(body):
     command = body['data']['name']
-    
+
     if command == 'wordle':
-        response = json.dumps({
+        return wordle(body)
+
+
+def wordle(body):
+    return {
+        'statusCode': 200,
+        'body': json.dumps({
             'type': 4,
             'data': {
                 'content': f"{body['data']['options'][0]['value']}",
             }
         })
-        return {
-            'statusCode': 200,
-            'body': response
-        }
-    else:
-        return {
-            'statusCode': 400,
-            'body': json.dumps('unhandled command')
-        }
-#####
-# Functions that correspond to slash commands
-#####
+    }
 
-def wordle(body):
+
+def leaderboard(body):
     pass
+
+
+def stat(body):
+    pass
+
+
+def verify(event,body):
+
+    signature = event['headers']['x-signature-ed25519']
+    timestamp = event['headers']['x-signature-timestamp']
+
+    # validate the interaction
+    verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
+
+    message = timestamp + \
+        json.dumps(body, separators=(',', ':'), ensure_ascii=False)
+
+    try:
+        verify_key.verify(message.encode(),
+                          signature=bytes.fromhex(signature))
+    except BadSignatureError:
+        return {
+            'statusCode': 401,
+            'body': json.dumps('invalid request signature')
+        }
