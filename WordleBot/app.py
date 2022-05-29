@@ -9,6 +9,7 @@ PUBLIC_KEY = ssm.get_parameter( Name='public-key', WithDecryption=False)['Parame
 
 
 def lambda_handler(event, context):
+    print(event)
     try:
         body = json.loads(event['body'])
 
@@ -18,12 +19,12 @@ def lambda_handler(event, context):
         # validate the interaction
         verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 
-        message = timestamp + json.dumps(body, separators=(',', ':'))
+
+        message = timestamp + json.dumps(body, separators=(',', ':'), ensure_ascii=False)
 
         try:
             print('verify')
-            verify_key.verify(message.encode(),
-                              signature=bytes.fromhex(signature))
+            verify_key.verify(message.encode(),signature=bytes.fromhex(signature))
         except BadSignatureError:
             print('failed')
             return {
