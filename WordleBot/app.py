@@ -2,11 +2,10 @@ import json
 import boto3
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
-
+import re
 
 ssm = boto3.client('ssm')
-PUBLIC_KEY = ssm.get_parameter(
-    Name='public-key', WithDecryption=False)['Parameter']['Value']
+PUBLIC_KEY = ssm.get_parameter(Name='public-key', WithDecryption=False)['Parameter']['Value']
 
 
 def lambda_handler(event, context):
@@ -43,12 +42,19 @@ def command_handler(body):
 
 
 def wordle(body):
+    print(body['data']['options'][0]['value'])
+    value = re.match("^\s*Wordle\s*([0-9]+)\s*(\d)\/(\d)\s*((?:[🟩⬛🟨]{5}\s*){1,6})$",body['data']['options'][0]['value'])
+    print(value)
+    if value:
+        value= "Valid"
+    else:
+        value= "Not Valid"
     return {
         'statusCode': 200,
         'body': json.dumps({
             'type': 4,
             'data': {
-                'content': f"{body['data']['options'][0]['value']}",
+                'content': f"{value}",
             }
         })
     }
