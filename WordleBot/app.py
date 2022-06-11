@@ -42,13 +42,12 @@ def command_handler(body):
 
 
 def wordle(body):
-    print(body['data']['options'][0]['value'])
-    value = re.match("^\s*Wordle\s*([0-9]+)\s*(\d)\/(\d)\s*((?:[🟩⬛🟨]{5}\s*){1,6})$",body['data']['options'][0]['value'])
-    print(value)
+    reg = "^\s*Wordle\s*([0-9]+)\s*(\d)\/\d\s*((?:[🟩⬛🟨]{5}\s*){1,6})$"
+    value = re.match(reg,body['data']['options'][0]['value'])
     if value:
         value= "Valid"
     else:
-        value= "Not Valid"
+        value= "Not a valid input"
     return {
         'statusCode': 200,
         'body': json.dumps({
