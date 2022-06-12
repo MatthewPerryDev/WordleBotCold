@@ -11,7 +11,23 @@ PUBLIC_KEY = ssm.get_parameter(Name='public-key', WithDecryption=False)['Paramet
 def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
-        verify(event,body)
+        signature = event['headers']['x-signature-ed25519']
+        timestamp = event['headers']['x-signature-timestamp']
+
+        # validate the interaction
+        verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
+
+        message = timestamp + \
+            json.dumps(body, separators=(',', ':'), ensure_ascii=False)
+
+        try:
+            verify_key.verify(message.encode(),
+                            signature=bytes.fromhex(signature))
+        except BadSignatureError:
+            return {
+                'statusCode': 401,
+                'body': json.dumps('invalid request signature')
+            }
         # handle the interaction
 
         t = body['type']
@@ -45,7 +61,8 @@ def wordle(body):
     reg = "^\s*Wordle\s*([0-9]+)\s*(\d)\/\d\s*((?:[🟩⬛🟨]{5}\s*){1,6})$"
     value = re.match(reg,body['data']['options'][0]['value'])
     if value:
-        value= "Valid"
+        table = boto3.resource('dynamodb').Table('WordleBotDatabase')
+        value = table.creation_date_time
     else:
         value= "Not a valid input"
     return {
@@ -67,22 +84,4 @@ def stat(body):
     pass
 
 
-def verify(event,body):
 
-    signature = event['headers']['x-signature-ed25519']
-    timestamp = event['headers']['x-signature-timestamp']
-
-    # validate the interaction
-    verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
-
-    message = timestamp + \
-        json.dumps(body, separators=(',', ':'), ensure_ascii=False)
-
-    try:
-        verify_key.verify(message.encode(),
-                          signature=bytes.fromhex(signature))
-    except BadSignatureError:
-        return {
-            'statusCode': 401,
-            'body': json.dumps('invalid request signature')
-        }
